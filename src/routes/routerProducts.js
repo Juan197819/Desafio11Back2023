@@ -1,12 +1,11 @@
 import {Router} from 'express'
 import {controllerProducts} from '../controllers/controllerProducts.js'
-import { isAdmin } from '../middleware/isAdmin.js'
-import { authPassport } from '../middleware/authPasport.js'
+import { validationFieldsDates } from '../middleware/validationFieldsDates.js'
+import { schemaProducts } from '../daos/MongoDB/models/modelProducts.js'
 
 export const routerProducts = Router()
 
-routerProducts.use( authPassport, isAdmin)
-routerProducts.post('/', controllerProducts.controllerAddProduct)
+routerProducts.post('/', validationFieldsDates, controllerProducts.controllerAddProduct)
 routerProducts.get('/', controllerProducts.controllerGetProducts) 
 routerProducts.get('/:pid',controllerProducts.controllerGetProductById)
 routerProducts.put('/:pid', controllerProducts.controllerUpdateProduct)

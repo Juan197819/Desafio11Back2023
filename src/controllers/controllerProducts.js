@@ -5,6 +5,7 @@ class ControllerProducts {
     async controllerAddProduct (req, res, next){
         try {
             const product = req.body
+            console.log('product', product)
             const response = await serviceProducts.serviceAddProduct(product)
             res.status(200).json(response)           
         } catch (error) {

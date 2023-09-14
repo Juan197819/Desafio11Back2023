@@ -13,10 +13,10 @@ export const configSession = session({
     store: new MongoStore({
         mongoUrl,
         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-        ttl: 10
+        // ttl: 10
     }),
     rolling: true,
     cookie: {
-        maxAge: 100000
+        // maxAge: 100000
     }
 })

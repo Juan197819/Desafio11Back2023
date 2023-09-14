@@ -1,3 +1,4 @@
+import { errorCustom } from "../middleware/errorHandler.js"
 import { serviceCarts } from "../services/serviceCarts.js"
 
 class ControllerCarts {
@@ -13,7 +14,7 @@ class ControllerCarts {
         try {
             const {cid} = req.params
             const products = await serviceCarts.serviceGetProdToCart(cid)
-            if (!products.length) throw new Error("There are no products in your cart yet")
+            if (!products.length) throw new errorCustom("There are no products in your cart yet",400,)
             res.status(200).json(products)
         } catch (error) {
             

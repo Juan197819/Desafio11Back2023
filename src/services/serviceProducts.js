@@ -1,4 +1,5 @@
 import config from '../config/configEnv.js';
+import { errorCustom } from '../middleware/errorHandler.js';
 import { repository } from '../repository/repository.js';
 const { default: daoProducts } = await import(`../daos/${config.PERSISTENCE}/daoProducts.js`)
 console.log('Persistencia',config.PERSISTENCE)
@@ -9,8 +10,8 @@ class ServiceProducts {
             const newProduct = await daoProducts.addProduct(product)
             return newProduct
         } catch (error) {
-            console.log('error MOngo',error)
-            if (error.name == 'ValidationError') throw new Error('Error saving product, incomplete product data!') 
+            console.log(error.name)
+            if (error.name == 'ValidationError') throw new errorCustom('Error saving product, incomplete or incorrect product data!',400, error) 
             throw error
         }
     }

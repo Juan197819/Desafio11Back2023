@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as StrategyLocal } from "passport-local";
 import { isValidPass, serviceUsers } from "../services/serviceUsers.js";
 import { repository } from "../repository/repository.js";
+import { errorCustom, errorHandler } from "../middleware/errorHandler.js";
 
 const strategyOptions = {
     usernameField: 'email',
@@ -18,7 +19,7 @@ async function login(req, email, password, done) {
         }
         return done(null,user)    
     } catch (error) {
-        throw error
+        return done(error, true)    
     }
 }
 async function register(req, email, password, done) {
@@ -26,11 +27,11 @@ async function register(req, email, password, done) {
         const user = await serviceUsers.serviceGetByEmail(email)
         if (user) {
             return done(null, false)
-        }  
+        }
         const newUser = await serviceUsers.serviceAddUser(req.body)
         return done(null, newUser)    
     } catch (error) {
-        throw error
+        return done(error, true)    
     }
 }
 
@@ -42,6 +43,10 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-    const user = await repository.repositoryGetUsersById(id);
-    return done(null, user);
+    try {
+        const user = await repository.repositoryGetUsersById(id);
+        return done(null, user);        
+    } catch (error) {
+        throw error
+    }
 });
