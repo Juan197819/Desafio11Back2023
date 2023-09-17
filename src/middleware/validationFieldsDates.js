@@ -37,7 +37,7 @@ export function validationFieldsDates(req, res, next) {
     let incorrectlyEnteredFields = evalFieldsWithSchemaMongo(req.body, schemaValidation)
 
     if (Object.keys(incorrectlyEnteredFields).length) {
-        throw new errorCustom(`Error saving resource, en route ${req.baseUrl} incomplete or incorrect data!`, 400, { incorrectlyEnteredFields })
+        throw new errorCustom('Bad Request',  400,`Error saving resource, en route ${req.baseUrl} incomplete or incorrect data!`, { incorrectlyEnteredFields })
     } else {
         next()
     }

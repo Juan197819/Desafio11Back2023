@@ -19,8 +19,6 @@ class ServiceTest {
             }
             return arrayProduct
         } catch (error) {
-            console.log('error MOngo', error)
-            if (error.name == 'ValidationError') throw new Error('Error saving product, incomplete product data!')
             throw error
         }
     }

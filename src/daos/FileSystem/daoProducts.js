@@ -1,5 +1,6 @@
 import fs from 'fs'
 import productsList from './db/products.js'  
+import { errorCustom } from '../../middleware/errorHandler.js'
 
 class DaoProducts {
     constructor(pathProducts){
@@ -45,9 +46,9 @@ class DaoProducts {
     async getProductById(id){
         try {
             const products = await this.getProducts()
-            const producto = products.find(product=>product.id==id)
-            if(!producto) throw new Error(`Product ID ${id} Not found`)
-            return producto
+            const product = products.find(product=>product.id==id)
+            if (!product) throw new errorCustom('Not Found', 404, `Product ID ${id} not found, failed product search`)
+            return product
         } catch (error) {
             throw (error)   
         }
@@ -61,7 +62,7 @@ class DaoProducts {
                 return p
             })
             await fs.promises.writeFile(this.pathProducts, JSON.stringify(updateArray))
-            return (`Producto id ${id} modificado con exito`);
+            return (`Product id ${id} modified successfully`);
         } catch (error) {
             throw (error)   
         }
@@ -72,7 +73,7 @@ class DaoProducts {
             const arrayProduct = await this.getProducts()
 
             await fs.promises.writeFile(this.pathProducts, JSON.stringify( arrayProduct.filter(p=>p.id!=id)))
-            return (`Producto id ${id} eliminado con exito`);
+            return (`Product id ${id} successfully deleted`);
         } catch (error) {
             throw (error)   
         }

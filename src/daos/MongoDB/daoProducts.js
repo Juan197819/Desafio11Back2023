@@ -1,27 +1,33 @@
+import { errorCustom } from "../../middleware/errorHandler.js"
 import { ModelProducts } from "./models/modelProducts.js"
 
 class DaoProducts {
     async addProduct(product){
         try {
             const newProduct = await ModelProducts.create(product)
-            
             return newProduct
         } catch (error) {
             throw (error)   
         }
     }
-    async getProducts(limit = 10, page = 1, sort, query = {}, value) {
+
+    /**Esta función busca todos los productos de la BD de Mongo con su paginacion dependiendo de los queryParams ingresados en la ruta.
+     * @param {number | undefined} [limit] - Valor maximo de productos a mostrar por página. Defaults to 10.
+     * @param {Number | undefined} [page] - Numero de página que queremos ver.  Defaults to 1
+     * @param {1 | -1 | undefined} [sort] - Valor para ordenar por precio los productos traidos (campo "price"). Valores posibles 1 y -1: "1" ordena de menor a mayor y "-1" de mayor a menor. Si viene vacio no se ordena.
+     * @param {object} [query] - Trae un objeto con todos los filtros de campos que puse en los query params, asi se puede filtrar por el campo que quiera (title, category, stock, etc) e incluso usar varios a la vez, si viene vacio trae todos los productos.
+     * @returns {object} - Retorna un objeto con los datos de productos y de paginación 
+     */
+    async getProducts(limit = 10, page = 1, sort, query = {}) {
         try {
-            //"query" trae un objeto con todos los filtros de campos que puse en los query params
-            //asi se puede filtrar por el campo que quiera (title, category, stock, etc) e incluso usar varios a la vez, si viene vacio trae todos los productos.
-
             console.log('sort', sort, 'limit', limit, 'page', page, 'query',query)
-            //Si el query params p/ ordenar ('sort') viene vacio no se ordena, con 1 ó -1 se ordena por precio ("price")
-            const order= sort?{price:sort}:null
+            const order = sort == 1 || sort==-1 ? { price: sort } : null
+            console.log(order)
             const response = await ModelProducts.paginate(query,{page,limit, sort:order})
-            //Iniciando con la  ruta http://localhost:8080/products en el navegador puedo usar los botones Anterior" y "Siguiente" para ver todas las paginas. 
-
-            //la Variable "search" de abajo se usa para tomar todos los campos de filtro guardados en "query" (que vienen de los query params) y armar las rutas de "prevLink" y "nextLink" con los mismos filtros de la primer peticion.
+            /**
+             *  la Variable "search" se usa para tomar todos los campos de filtro guardados en "query" (que vienen de los query params) y armar las rutas de "prevLink" y "nextLink" del objeto "newResponse" con los mismos filtros de la primer peticion.
+             * @type {string} - Si "Object.entries(query).length" es false significa que el "query" vino vacio. Si es true con el for...in guardamos todas las claves-valor de filtros como un String en la variable "search" que luego usamos par armar las rutas de "prevLink" y "nextLink" Default empty
+             */
             let search = ''
             if (Object.entries(query).length) {
                 for (const r in query) {
@@ -48,30 +54,30 @@ class DaoProducts {
     async getProductById(id){
         try {
             const product =  await ModelProducts.findById(id)
-            if(!product) throw new Error(`Product ID ${id} Not found`)
+            if (!product) throw new errorCustom('Not Found', 404, `Product ID ${id} not found, failed product search`)
             return product
         } catch (error) {
-            if (error.name == 'CastError') throw new Error('Nonexistent Product! (Incompleted or incorrect ID)') 
+            if (error.name == 'CastError') throw new errorCustom('Bad Request', 400, 'Error in product search: incorrect id format', error) 
             throw (error)   
         }
     }
     async updateProduct(id, newProduct){
         try {
            const product=  await ModelProducts.findByIdAndUpdate(id, newProduct)
-           if(!product) throw new Error(`Product ID ${id} Not found`)
-           return (`Producto id ${id} modificado con exito`);
+            if (!product) throw new errorCustom('Not Found', 404, `Product ID ${id} not found, product update failed`)
+            return (`Product id ${id} modified successfully`);
         } catch (error) {
-            if (error.name == 'CastError') throw new Error('Nonexistent Product! (Incompleted or incorrect ID)') 
+            if (error.name == 'CastError') throw new errorCustom('Bad Request', 400, 'Error in product search: incorrect id format', error) 
             throw (error)   
         }
     }
     async deleteProduct(id){
         try { 
             const product= await ModelProducts.findByIdAndDelete(id)
-            if(!product) throw new Error(`Product ID ${id} Not found`)
-            return (`Producto id ${id} eliminado con exito`);
+            if (!product) throw new errorCustom('Not Found', 404, `Product ID ${id} not found, failed product removal`)
+            return (`Product id ${id} successfully deleted`);
         } catch (error) {
-            if (error.name == 'CastError') throw new Error('Nonexistent Product! (Incompleted or incorrect ID)') 
+            if (error.name == 'CastError') throw new errorCustom('Bad Request', 400, 'Error in product search: incorrect id format', error) 
             throw (error)   
         }
     }

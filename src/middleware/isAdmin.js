@@ -1,3 +1,5 @@
+import { errorCustom } from "./errorHandler.js"
+
 export function isAdmin(req, res, next) {
     if (req.method == 'GET') {
         next()
@@ -5,7 +7,7 @@ export function isAdmin(req, res, next) {
         if (req.user.rol == 'Administrador') {
             next()
         } else {
-            throw new Error('Access denied!! Route only for administrators')
+            throw new errorCustom('Unauthorized', 401, 'Access denied!! (Route only for administrators)')
         }
     }
 }

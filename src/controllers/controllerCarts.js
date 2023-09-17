@@ -14,10 +14,8 @@ class ControllerCarts {
         try {
             const {cid} = req.params
             const products = await serviceCarts.serviceGetProdToCart(cid)
-            if (!products.length) throw new errorCustom("There are no products in your cart yet",400,)
             res.status(200).json(products)
         } catch (error) {
-            
             next(error)
         }
     }

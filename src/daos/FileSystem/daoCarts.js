@@ -24,7 +24,7 @@ class DaoCarts {
         try {
             let carts = await this.#getCarts() // return =>[{...}] || []
             let cart = carts.find(c=>c.id==id) // return {...} || undefined
-            if (!cart) throw new Error('Nonexistent cart!')
+            if (!cart) throw new errorCustom('Not Found', 404, `Cart ID ${id} not found, try again!!`)
             return cart
         } catch (error) {
             throw (error)    
@@ -55,7 +55,7 @@ class DaoCarts {
         try {
             let carts = await this.#getCarts()
             let indexCart =carts.findIndex(c=>c.id==cid)
-            if(indexCart == -1) throw new Error ('Nonexistent cart!')
+            if(indexCart == -1) throw new errorCustom('Not Found', 404, `Cart ID ${cid} not found, try again!!`)
 
             let indexProd = carts[indexCart].products.findIndex(p=>p.id==pid)
             if (indexProd != -1) {

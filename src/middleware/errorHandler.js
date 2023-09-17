@@ -1,31 +1,28 @@
 /**
- * Esta funcion crea un objeto de error personalizado
- * @param {String} message - Mensaje de error personalizado
+ * Esta funcion crea un objeto de error personalizado que se lanza para ser capturado en la funcion "errorHandler".
+ * @param {String} error - Nombre o tipo de Error
  * @param {Number} status - Codigo de estado 
- * @param {object} originalError - Error Original 
+ * @param {String} message - Mensaje de error personalizado
+ * @param {object} [detailsError] - Detalles especiales
  * @returns 
  */
-export function errorCustom(message, status, detailsError, originalError) {
-    return { errCustom: { message, status, detailsError}, originalError}
+export function errorCustom(error, status, message, detailsError) {
+    return { errCustom: { error, status, message, detailsError}}
 }
 /**
- * El errorHandler toma el objeto Error lanzado y lo analiza. Si fue un error controlado desde los endpoint lo desestructura para mandar el error original como loguer a consola y, al mismo tiempo, mandar como respuesta al cliente el error personalizado. Si el error fue inesperado el parametro "originalError" sera undefined por ende entrara en el if y ahi se personalizara llamando la funcion "errorCustom()". De esta manera todos los errores (inesperados o no) tendran el mismo formato para la respuesta y se loguearan en consola.
+ * El errorHandler captura todos los posibles errores de la App y verifica si es un error ya personalizado (deberia venir la variable "errCustom" en true) lo devuelve como respuesta al cliente y como "stack" solo existe en errores inesperados del servidor logueamos el error personalizado completo. En el caso de un error inesperado antes de enviarlo como respuesta lo personalizamos con los datos orignales y logueamos el "stack" que si viene desde el servidor.
  * @param {object} error - Error Personalizado mediante la funcion errorCustom() o inesperado generado automaticamente.
  * @param {empty} req - Viene desde peticion (No es utilizado en esta funcion )
  * @param {object} res -  Viene desde peticion para responder con error generado.
  * @param {function} next -  Viene desde peticion (No es utilizado en esta funcion )
  */
 export function errorHandler(error, req, res, next) {
-    let { errCustom, originalError } = error
+    //Al meter el error personalizado dentro de la prop. "errorCustom" puedo (con el if (!errCustom) diferenciar a los ya personalizados de los que no (inesperados) y asi darle formato a estos ultimos usando los datos del error original.
+    let { errCustom, stack } = error
     if (!errCustom) {
-        console.log('entro en origianerror')
-        console.log('status',error.status)
-        console.log('statusCode',error.statusCode)
-
-        let errorCompleto = (errorCustom(error.message, error.statusCode || 500, error.name))
+        let errorCompleto = (errorCustom(error.name, error.status || error.statusCode || 500, error.message))
         errCustom= errorCompleto.errCustom
-        originalError = errorCompleto.originalError
     }
-    console.log('Error Original', errCustom)
+    console.log('Error Original', stack|| errCustom) 
     res.status(errCustom.status).json(errCustom)
 }

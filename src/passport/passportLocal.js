@@ -2,7 +2,6 @@ import passport from "passport";
 import { Strategy as StrategyLocal } from "passport-local";
 import { isValidPass, serviceUsers } from "../services/serviceUsers.js";
 import { repository } from "../repository/repository.js";
-import { errorCustom, errorHandler } from "../middleware/errorHandler.js";
 
 const strategyOptions = {
     usernameField: 'email',

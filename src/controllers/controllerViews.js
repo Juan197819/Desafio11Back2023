@@ -2,7 +2,7 @@ import { serviceProducts } from "../services/serviceProducts.js"
 import { serviceCarts } from "../services/serviceCarts.js";
 import __dirname from "../../utils.js";
 import {io} from '../../app.js'
-import { dtoProfile } from "../dtos/dtoProfile.js";
+import { errorCustom } from "../middleware/errorHandler.js";
 
 class ControllerViews{
     async controllerIndex(req, res, next) {
@@ -90,9 +90,8 @@ class ControllerViews{
     async controllerLogout(req, res, next){
         try {
             req.session.destroy(err=>{
-                if(err){
-                    throw new Error('Error when deleting the session')
-                } console.log('Session delete!!')
+                if(err) throw new errorCustom('Internal server error', 500, 'An internal error occurred in the express-session module when trying to delete the current session!')
+                console.log('Session delete!!')
                 res.status(200).redirect('/login')   
             })
         } catch (error) { 

@@ -10,8 +10,6 @@ class ServiceProducts {
             const newProduct = await daoProducts.addProduct(product)
             return newProduct
         } catch (error) {
-            console.log(error.name)
-            if (error.name == 'ValidationError') throw new errorCustom('Error saving product, incomplete or incorrect product data!',400, error) 
             throw error
         }
     }

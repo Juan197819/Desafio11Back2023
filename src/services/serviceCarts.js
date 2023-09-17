@@ -15,8 +15,8 @@ class ServiceCarts {
     }
     async serviceGetProdToCart (cid){
         try {
-            const cart = await daoCart.getProdToCart(cid)//C/ FileSystem devuelve cart existente con o sin productos o salta el error en DAO
-            return cart.products
+            const products = await daoCart.getProdToCart(cid)
+            return products
         } catch (error) {
             throw error
         }

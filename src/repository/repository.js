@@ -15,23 +15,20 @@ class Repository {
             throw error
         }
     }
-    
-    async repositoryGetUsersById(id) {
-        try {
-            const user = await serviceUsers.serviceGetById(id);
-            return dtoProfile(user) 
-        } catch (error) {
-            throw error
-        }
-    }
-
     async repositoryGetProductsWithPaginate(reqQuery) {
         try {
             let { limit, page, sort, ...query } = reqQuery
             const response = await daoProducts.getProducts(limit, page, sort, query)
             const products = dtoViews(response)
-            
             return {products,...response} 
+        } catch (error) {
+            throw error
+        }
+    }
+    async repositoryGetUsersById(id) {
+        try {
+            const user = await serviceUsers.serviceGetById(id);
+            return dtoProfile(user) 
         } catch (error) {
             throw error
         }
